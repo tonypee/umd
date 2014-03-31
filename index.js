@@ -6,8 +6,10 @@ var uglify = require('uglify-js');
 var templateSTR = rfile('./template.js');
 
 function template(moduleName, cjs) {
-  var str = uglify.minify(
-    templateSTR.replace(/\{\{defineNamespace\}\}/g, compileNamespace(moduleName)),
+  var tpl = templateSTR.replace(/\{\{defineNamespace\}\}/g, compileNamespace(moduleName));
+  tpl = tpl.replace(/\{\{amdNamespace\}\}/g, compileAmdNamespace(moduleName));
+
+  var str = uglify.minify(tpl,
     {fromString: true}).code
     .split('source()')
   str[0] = str[0].trim();
@@ -57,6 +59,9 @@ function camelCase(name) {
   return name.replace(/[^a-zA-Z0-9]+/g, '')
 }
 
+function compileAmdNamespace(name) {
+  return camelCase(name);
+}
 
 function compileNamespace(name) {
   var names = name.split('.')
